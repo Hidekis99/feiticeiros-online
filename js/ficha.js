@@ -70,3 +70,42 @@ function calcularEnergia() {
 
   return total;
 }
+document.getElementById("salvarFicha").onclick = async () => {
+
+  let especializacoes = {};
+
+  for (const key in especializacoesData) {
+    const valor = parseInt(document.getElementById(`esp-${key}`).value) || 0;
+    if (valor > 0) {
+      especializacoes[key] = valor;
+    }
+  }
+
+  const hpBase = calcularHP();
+  const energiaBase = calcularEnergia();
+
+  const personagem = {
+    especializacoes,
+    atributos: {
+      forca: parseInt(forca.value),
+      tecnica: parseInt(tecnica.value),
+      controle: parseInt(controle.value),
+      velocidade: parseInt(velocidade.value),
+      resistencia: parseInt(resistencia.value)
+    },
+    hp: {
+      base: hpBase,
+      bonusExtra: 0,
+      atual: hpBase
+    },
+    energia: {
+      base: energiaBase,
+      bonusExtra: 0,
+      atual: energiaBase
+    }
+  };
+
+  await setDoc(doc(db, "characters", characterId), personagem);
+
+  alert("Ficha salva com sucesso!");
+};
