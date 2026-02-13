@@ -1,1 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Ficha</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
 
+<div class="card">
+  <h2 id="nomePersonagem">Nome do Personagem</h2>
+  <p>Nível: <span id="nivelTotal">1</span></p>
+  <p>HP: <span id="hpAtual"></span> / <span id="hpMax"></span></p>
+  <p>Energia: <span id="energiaAtual"></span> / <span id="energiaMax"></span></p>
+</div>
+
+<div class="tabs">
+  <div class="tab active" data-tab="atributos">Atributos</div>
+  <div class="tab" data-tab="pericias">Perícias</div>
+  <div class="tab" data-tab="combate">Combate</div>
+  <div class="tab" data-tab="tecnicas">Técnicas</div>
+  <div class="tab" data-tab="log">Log</div>
+</div>
+
+<div id="atributos" class="tab-content active">
+  <!-- Atributos aqui -->
+</div>
+
+<div id="pericias" class="tab-content">
+  <!-- Perícias aqui -->
+</div>
+
+<div id="combate" class="tab-content">
+  <!-- Armas e ataque -->
+</div>
+
+<div id="tecnicas" class="tab-content">
+  <!-- Técnicas custom -->
+</div>
+
+<div id="log" class="tab-content">
+  <!-- Histórico -->
+</div>
+
+<script type="module" src="js/ficha.js"></script>
+</body>
+</html>
