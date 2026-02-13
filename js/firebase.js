@@ -3,12 +3,13 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-aut
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "Feiticeiros.firebaseapp.com",
-  projectId: "feiticeiros_online",
-  storageBucket: "SEU_BUCKET",
-  messagingSenderId: "SEU_ID",
-  appId: "SEU_APP_ID"
+  apiKey: "AIzaSyDYLRZwbrHhySwjD_6E3qZXkBAF31NffI8",
+  authDomain: "feiticeiros-online.firebaseapp.com",
+  projectId: "feiticeiros-online",
+  storageBucket: "feiticeiros-online.firebasestorage.app",
+  messagingSenderId: "118808818712",
+  appId: "1:118808818712:web:29fa24d60feabe384bff6d",
+  measurementId: "G-DC2BW8KY56"
 };
 
 const app = initializeApp(firebaseConfig);
