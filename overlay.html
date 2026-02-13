@@ -1,1 +1,29 @@
+import { db, auth } from "./firebase.js";
+import {
+  collection,
+  addDoc,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+auth.onAuthStateChanged(async user => {
+  if (!user) return location = "index.html";
+
+  const snap = await getDocs(collection(db, "characters"));
+
+  snap.forEach(doc => {
+    const div = document.createElement("div");
+    div.innerHTML = `
+      <button onclick="location='ficha.html?id=${doc.id}'">
+        ${doc.id}
+      </button>
+    `;
+    lista.appendChild(div);
+  });
+});
+
+novo.onclick = async () => {
+  const docRef = await addDoc(collection(db, "characters"), {
+    nome: "Novo Personagem"
+  });
+  location = `ficha.html?id=${docRef.id}`;
+};
