@@ -46,3 +46,28 @@ export function rolarDano(danoString, critico = false) {
 
     return total;
 }
+
+export function calcularHP(especializacoes, dadosEspecializacoes) {
+    let totalHP = 0;
+    let primeiraEspecializacao = true;
+
+    for (const nome in especializacoes) {
+        const niveis = especializacoes[nome];
+        const dados = dadosEspecializacoes[nome];
+
+        if (!dados) continue;
+
+        for (let i = 1; i <= niveis; i++) {
+
+            if (primeiraEspecializacao && i === 1) {
+                totalHP += dados.hpPrimeiroNivel;
+                primeiraEspecializacao = false;
+            } else {
+                totalHP += dados.hpPorNivel;
+            }
+
+        }
+    }
+
+    return totalHP;
+}
