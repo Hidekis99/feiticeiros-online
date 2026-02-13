@@ -1,111 +1,88 @@
+import { db } from "./firebase.js";
+import {
+  collection,
+  getDocs,
+  doc,
+  setDoc,
+  addDoc,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+import { rolarPericia, calcularBonusMaestria } from "./motor.js";
+
+let especializacoesData = {};
+let characterId = new URLSearchParams(location.search).get("id");
+
 document.querySelectorAll(".tab").forEach(tab => {
   tab.onclick = () => {
     document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
     document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
-
     tab.classList.add("active");
     document.getElementById(tab.dataset.tab).classList.add("active");
   };
 });
-import { db } from "./firebase.js";
-import { collection, getDocs, doc, setDoc } 
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-let especializacoesData = {};
-let characterId = new URLSearchParams(window.location.search).get("id");
 
 async function carregarEspecializacoes() {
   const snapshot = await getDocs(collection(db, "specializations"));
-
-  const container = document.getElementById("listaEspecializacoes");
-
   snapshot.forEach(docSnap => {
-    const data = docSnap.data();
-    especializacoesData[docSnap.id] = data;
-
-    const div = document.createElement("div");
-
-    div.innerHTML = `
-      <label>${data.nome}</label>
-      <input type="number" min="0" value="0" id="esp-${docSnap.id}">
+    especializacoesData[docSnap.id] = docSnap.data();
+    listaEspecializacoes.innerHTML += `
+      <label>${docSnap.data().nome}</label>
+      <input type="number" id="esp-${docSnap.id}" min="0" value="0"><br>
     `;
-
-    container.appendChild(div);
   });
 }
-
 carregarEspecializacoes();
-function calcularHP() {
-  let total = 0;
-  let primeira = true;
 
-  for (const key in especializacoesData) {
-    const niveis = parseInt(document.getElementById(`esp-${key}`).value) || 0;
-    const dados = especializacoesData[key];
-
-    for (let i = 1; i <= niveis; i++) {
-      if (primeira && i === 1) {
-        total += dados.hpPrimeiroNivel;
-        primeira = false;
-      } else {
-        total += dados.hpPorNivel;
-      }
-    }
-  }
-
-  return total;
-}
-
-function calcularEnergia() {
-  let total = 0;
-
-  for (const key in especializacoesData) {
-    const niveis = parseInt(document.getElementById(`esp-${key}`).value) || 0;
-    const dados = especializacoesData[key];
-
-    if (!dados.usaEnergia) continue;
-
-    total += niveis * dados.energiaPorNivel;
-  }
-
-  return total;
-}
 document.getElementById("salvarFicha").onclick = async () => {
-
-  let especializacoes = {};
-
-  for (const key in especializacoesData) {
-    const valor = parseInt(document.getElementById(`esp-${key}`).value) || 0;
-    if (valor > 0) {
-      especializacoes[key] = valor;
-    }
-  }
-
-  const hpBase = calcularHP();
-  const energiaBase = calcularEnergia();
-
-  const personagem = {
-    especializacoes,
+  await setDoc(doc(db, "characters", characterId), {
     atributos: {
-      forca: parseInt(forca.value),
-      tecnica: parseInt(tecnica.value),
-      controle: parseInt(controle.value),
-      velocidade: parseInt(velocidade.value),
-      resistencia: parseInt(resistencia.value)
-    },
-    hp: {
-      base: hpBase,
-      bonusExtra: 0,
-      atual: hpBase
-    },
-    energia: {
-      base: energiaBase,
-      bonusExtra: 0,
-      atual: energiaBase
+      forca: parseInt(forca.value) || 0,
+      tecnica: parseInt(tecnica.value) || 0,
+      controle: parseInt(controle.value) || 0,
+      velocidade: parseInt(velocidade.value) || 0,
+      resistencia: parseInt(resistencia.value) || 0
     }
-  };
+  }, { merge: true });
 
-  await setDoc(doc(db, "characters", characterId), personagem);
-
-  alert("Ficha salva com sucesso!");
+  alert("Salvo!");
 };
+
+const periciasBase = [
+  { nome: "Combate", atributo: "forca" },
+  { nome: "Ocultismo", atributo: "controle" }
+];
+
+periciasBase.forEach(p => {
+  listaPericias.innerHTML += `
+    <strong>${p.nome}</strong>
+    <input type="checkbox" id="treinado-${p.nome}">Treinado
+    <input type="checkbox" id="mestre-${p.nome}">Mestre
+    <button onclick="rolar('${p.nome}', '${p.atributo}')">Rolar</button><br><br>
+  `;
+});
+
+window.rolar = async function(nome, atributo) {
+  const mod = parseInt(document.getElementById(atributo).value) || 0;
+  const bonus = calcularBonusMaestria(1);
+
+  const treinado = document.getElementById(`treinado-${nome}`).checked;
+  const mestre = document.getElementById(`mestre-${nome}`).checked;
+
+  const resultado = rolarPericia(mod, bonus, treinado, mestre);
+
+  await addDoc(collection(db, "rollLogs"), {
+    tipo: "pericia",
+    nome,
+    ...resultado,
+    timestamp: Date.now()
+  });
+};
+
+onSnapshot(collection(db, "rollLogs"), snapshot => {
+  listaLog.innerHTML = "";
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    listaLog.innerHTML += `${data.nome} - ${data.total} (${data.resultado})<br>`;
+  });
+});
