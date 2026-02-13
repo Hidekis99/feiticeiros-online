@@ -71,3 +71,17 @@ export function calcularHP(especializacoes, dadosEspecializacoes) {
 
     return totalHP;
 }
+export function calcularEnergia(especializacoes, dadosEspecializacoes) {
+    let totalEnergia = 0;
+
+    for (const nome in especializacoes) {
+        const niveis = especializacoes[nome];
+        const dados = dadosEspecializacoes[nome];
+
+        if (!dados || !dados.usaEnergia) continue;
+
+        totalEnergia += niveis * dados.energiaPorNivel;
+    }
+
+    return totalEnergia;
+}
