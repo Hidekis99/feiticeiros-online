@@ -35,3 +35,38 @@ async function carregarEspecializacoes() {
 }
 
 carregarEspecializacoes();
+function calcularHP() {
+  let total = 0;
+  let primeira = true;
+
+  for (const key in especializacoesData) {
+    const niveis = parseInt(document.getElementById(`esp-${key}`).value) || 0;
+    const dados = especializacoesData[key];
+
+    for (let i = 1; i <= niveis; i++) {
+      if (primeira && i === 1) {
+        total += dados.hpPrimeiroNivel;
+        primeira = false;
+      } else {
+        total += dados.hpPorNivel;
+      }
+    }
+  }
+
+  return total;
+}
+
+function calcularEnergia() {
+  let total = 0;
+
+  for (const key in especializacoesData) {
+    const niveis = parseInt(document.getElementById(`esp-${key}`).value) || 0;
+    const dados = especializacoesData[key];
+
+    if (!dados.usaEnergia) continue;
+
+    total += niveis * dados.energiaPorNivel;
+  }
+
+  return total;
+}
